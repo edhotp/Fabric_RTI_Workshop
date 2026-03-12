@@ -8,6 +8,78 @@ Real-Time Intelligence (RTI) is a powerful capability in Microsoft Fabric that e
 
 By the end of this workshop, you will have built a fully functional real-time analytics solution using Microsoft Fabric's core RTI components: **Real-Time Hub**, **Eventstream**, **Eventhouse (KQL Database)**, **Real-Time Dashboard**, and **Activator Alerts**.
 
+## Architecture
+
+The diagram below illustrates the end-to-end data flow built throughout this tutorial series:
+
+```mermaid
+flowchart LR
+    subgraph Source["Data Source"]
+        A["🚲 Bicycle Rentals\nSample Data"]
+    end
+
+    subgraph Ingestion["Real-Time Hub & Eventstream"]
+        B["Real-Time Hub"]
+        C["TutorialEventstream\n(Manage Fields:\nadd Timestamp)"]
+    end
+
+    subgraph Alerting["Activator"]
+        D["⚠️ Activator Alert\n(No_Bikes < 5)\n→ Teams Notification"]
+    end
+
+    subgraph Storage["Eventhouse — KQL Database (Tutorial)"]
+        direction TB
+        E["🥉 Bronze\nRawData"]
+        F["🥈 Silver\nTransformedData\n(Update Policy +\nTransformRawData Function)"]
+        G["🥇 Gold\nAggregatedData\n(Materialized View)"]
+        E -->|"Update Policy"| F
+        F -->|"Materialized View"| G
+    end
+
+    subgraph Analytics["Query & Insights"]
+        H["KQL Queryset\n(KQL / T-SQL / Copilot)"]
+    end
+
+    subgraph Visualization["Dashboards & Maps"]
+        I["📊 Real-Time Dashboard\n(Column Chart, Map Tile)"]
+        J["🗺️ Geospatial Map\n(Bike Stations +\nGeoJSON Overlays)"]
+    end
+
+    subgraph AnomalyDet["Anomaly Detection"]
+        K["🔍 BikeAnomalies\nDetector"]
+    end
+
+    subgraph External["External Storage"]
+        L["Lakehouse\n(GeoJSON Files)"]
+    end
+
+    A --> B --> C
+    C --> D
+    C --> E
+    G --> H
+    H --> I
+    H --> J
+    F --> K
+    L --> J
+```
+
+### Architecture Components
+
+| Component | Fabric Item | Tutorial |
+|-----------|-------------|----------|
+| **Data Source** | Bicycle Rentals sample data | [Part 2](tutorial-2-get-real-time-events.md) |
+| **Real-Time Hub** | Browse & connect to data streams | [Part 2](tutorial-2-get-real-time-events.md) |
+| **Eventstream** | TutorialEventstream (ingest + transform) | [Part 2](tutorial-2-get-real-time-events.md) |
+| **Activator Alert** | TutorialRule (No_Bikes < 5 → Teams) | [Part 3](tutorial-3-set-alert.md) |
+| **Eventhouse** | Tutorial (KQL Database) | [Part 1](tutorial-1-resources.md) |
+| **Bronze Layer** | RawData table | [Part 2](tutorial-2-get-real-time-events.md) |
+| **Silver Layer** | TransformedData table + Update Policy | [Part 4](tutorial-4-transform-kql-database.md) |
+| **Gold Layer** | AggregatedData materialized view | [Part 5](tutorial-5-query-data.md) |
+| **KQL Queryset** | KQL, T-SQL, and Copilot queries | [Part 5](tutorial-5-query-data.md) |
+| **Real-Time Dashboard** | TutorialDashboard | [Part 6](tutorial-6-create-dashboard.md) |
+| **Anomaly Detection** | BikeAnomalies detector | [Part 7](tutorial-7-create-anomaly-detection.md) |
+| **Geospatial Map** | TutorialMap + Lakehouse GeoJSON | [Part 8](tutorial-8-create-map.md) |
+
 ## Scenario
 
 The sample dataset used throughout this tutorial is a set of **bicycle rental data** from London, including bike IDs, docking station locations (latitude/longitude), timestamps, and availability metrics. You will ingest this data in real time and progressively build layers of analytics on top of it.

@@ -1,0 +1,126 @@
+# Real-Time Intelligence tutorial part 6: Create a Real-Time Dashboard
+
+> [!NOTE]
+> This tutorial is part of a series. For the previous section, see: [Real-Time Intelligence tutorial part 5: Query streaming data using KQL](tutorial-5-query-data).
+
+In this part of the tutorial, you learn how to create a Real-Time Dashboard in Real-Time Intelligence. You create a Kusto Query Language (KQL) query, create a Real-Time Dashboard, add a new tile to the dashboard, and explore the data visually by adding an aggregation.
+
+## Create a real-time dashboard
+
+1. In your KQL queryset, copy, paste, and run the following query. You might have already run this query from the previous section in this tutorial. This query returns a column chart showing the most recent number of bikes by *BikepointID*.
+
+    ```kusto
+    AggregatedData
+    | sort by BikepointID
+    | render columnchart with (ycolumns=No_Bikes,xcolumn=BikepointID)
+    ```
+
+    [![Screenshot of query showing column chart of bikes by bike point ID.](media/tutorial/bikes-by-bikepoint.png)](media/tutorial/bikes-by-bikepoint.png#lightbox)
+2. Select **Save to dashboard** > **New Real-Time Dashboard**.
+3. Enter the following information:
+
+    | Field | Value |
+    | --- | --- |
+    | **Name** | *TutorialDashboard* |
+    | **Location** | The workspace in which you created your resources |
+4. Select **Create**.
+
+    The new real-time dashboard, *TutorialDashboard*, opens with the New tile. You can also access the real-time dashboard by browsing to your workspace and selecting the desired item.
+
+    [![Screenshot of TutorialDashboard showing one new tile.](media/tutorial/tutorial-dashboard-new-tile.png)](media/tutorial/tutorial-dashboard-new-tile.png#lightbox)
+
+## Add a new tile by using a query
+
+Make sure that you're in **Editing** mode in the dashboard before beginning the following steps. If you're not in **Editing** mode, toggle from **Viewing** on the top right corner of the dashboard.
+
+1. Select **New tile**.
+2. In the query editor, enter and run the following query:
+
+    ```kusto
+    RawData
+    | where Timestamp > ago(1h)
+    ```
+3. Above the results pane, select **+ Add visual**.
+4. In the **Visual formatting** pane, enter the following information:
+
+    | Field | Value |
+    | --- | --- |
+    | Tile name | *Bike locations Map* |
+    | **Visual type** | *Map* |
+    | **Define location by** | *Latitude and longitude* |
+    | **Latitude column** | *Latitude* |
+    | **Longitude column** | *Longitude* |
+    | **Label column** | *BikepointID* |
+5. Select **Apply changes**.
+
+    You can resize the tiles and zoom in on the map as desired.
+
+    [![Screenshot of final dashboard with two tiles.](media/tutorial/final-dashboard.png)](media/tutorial/final-dashboard.png#lightbox)
+6. Save the dashboard by selecting the **Save** icon on the top left corner of the dashboard.
+
+## Customize tile visuals
+
+The tile customization options depend on the type of visual you use. For example, with a bar chart, you can change the bar orientation, adjust axis labels, and more. With a table visual, you can add or remove columns, change column order, and apply sorting.
+
+To customize the visualization of a tile on your dashboard, follow these steps:
+
+1. Make sure you're in editing mode.
+
+    [![Screenshot of editing and viewing mode toggle.](media/tutorial/tutorial-dashboard-edit-mode.png)](media/tutorial/tutorial-dashboard-edit-mode.png#lightbox)
+2. Select the **Edit** icon on the tile that you want to customize. The **Visual formatting** pane opens.
+3. Edit the underlying query or the [visualization customization properties](dashboard-visuals-customize#customization-properties).
+
+    [![Screenshot of the dashboard tile formatting options pane.](media/tutorial/tutorial-dashboard-customize.png)](media/tutorial/tutorial-dashboard-customize.png#lightbox)
+4. Select **Apply changes** to save your changes and return to the dashboard.
+
+## Set an alert
+
+You can set up [Activator](data-activator/activator-introduction) alerts on your Real-Time Dashboard tiles to get notified when certain conditions are met in your data. Set up an alert on the *Bike locations Map* tile to get notified when the number of bikes at any station exceeds a certain threshold.
+
+1. From the new bar chart tile, select the Alert icon. Or, from the **More options** (three dots) menu, select **Set Alert**.
+
+    [![Screenshot of the set alert option.](media/tutorial/tutorial-dashboard-set-alert.png)](media/tutorial/tutorial-dashboard-set-alert.png#lightbox)
+2. In the **Add rule** pane, enter the following information:
+
+    | Field | Value |
+    | --- | --- |
+    | **Details** |  |
+    | **Rule name** | *High Bike Count Alert* |
+    | **Monitor** |  |
+    | **Run query every** | *5 minutes* |
+    | **Condition** |  |
+    | **Check** | On each event grouped by\* |
+    | **Grouping field** | *No\_Bikes* |
+    | **When** | *BikepointID* |
+    | **Condition** | *Is greater than* |
+    | **Value** | *30* |
+    | **Occurrence** | *Every time the condition is met* |
+    | **Action** |  |
+    | **Select action** | *Message to individuals* |
+    | **To** | *Your Teams user name* |
+    | **Headline** | *Activator alert High Bike Count Alert* |
+    | **Notes** | *The condition for 'High Bike Count Alert' has been met* |
+    | **Save location** |  |
+    | **Workspace** | *The workspace where the tutorial resources reside* |
+    | **Item** | *Tutorial* |
+3. Select **Create**. When you see the success message, select **Open**.
+
+    [![Screenshot alert summary with the open button highlighted.](media/tutorial/tutorial-dashboard-alert-open.png)](media/tutorial/tutorial-dashboard-alert-open.png#lightbox)
+4. From the Activator Alerts page, you can view and manage your alert definitions, see analytics, and alert history.
+
+    For more details, see [Create alerts for a Real-Time Dashboard](data-activator/activator-get-data-real-time-dashboard).
+
+## Share the dashboard
+
+When you share a real-time dashboard, you can specify if the user can view, edit, or share. These permissions are for the real-time dashboard itself and not the underlying data.
+
+Share the database first, and then share the dashboard.
+
+1. Open the **Tutorial** eventhouse, select **Databases**, and select the **Share** button.
+
+    [![Screenshot of the Tutorial database share configuration screen.](media/tutorial/tutorial-share-databases.png)](media/tutorial/tutorial-share-databases.png#lightbox)
+2. Enter the name or email address of the user or group you want to share the dashboard with. Add a message if desired, and select **Grant**.
+3. Open the **TutorialDashboard**, and select the **Share** button.
+
+    [![Screenshot of the Tutorial dashboard share configuration screen.](media/tutorial/tutorial-dashboard-share.png)](media/tutorial/tutorial-dashboard-share.png#lightbox)
+4. Authorize the same user or group you shared the database with, set the permission level, add a message if desired, and select **Send**.
